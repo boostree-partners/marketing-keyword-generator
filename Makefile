@@ -117,6 +117,12 @@ test: setup
 	@echo ""
 	@. venv/bin/activate && cd src && python keyword_generator.py --version
 
+# 빌드 스크립트 테스트 (GitHub Actions 시뮬레이션)
+test-build:
+	@echo "🧪 Testing build script for GitHub Actions..."
+	@python test_build_local.py
+	@echo "✅ Build script test completed!"
+
 # 사용 예시 보기
 examples:
 	@echo "📚 키워드 생성기 사용 예시:"

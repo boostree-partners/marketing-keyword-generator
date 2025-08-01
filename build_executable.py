@@ -241,35 +241,55 @@ def main():
             elif os.path.isdir(item_path):
                 print(f"   📁 {item}/")
     
-    # Test execution option
-    print("\n🧪 Would you like to test the built executable?")
-    test_choice = input("   y/n (default: n): ").strip().lower()
+    # Check if running in CI/CD environment
+    is_ci = os.environ.get('CI') == 'true' or os.environ.get('GITHUB_ACTIONS') == 'true'
     
-    if test_choice == 'y':
-        current_platform = platform.system()
-        if current_platform == "Darwin":
-            test_cmd = ['open', 'dist/KeywordGenerator.app']
-        else:
-            test_cmd = ['dist/KeywordGenerator.exe']
+    if not is_ci:
+        # Test execution option (only in interactive environment)
+        print("\n🧪 Would you like to test the built executable?")
+        try:
+            test_choice = input("   y/n (default: n): ").strip().lower()
+            
+            if test_choice == 'y':
+                current_platform = platform.system()
+                if current_platform == "Darwin":
+                    test_cmd = ['open', 'dist/KeywordGenerator.app']
+                else:
+                    test_cmd = ['dist/KeywordGenerator.exe']
+                
+                run_command(test_cmd, "Testing execution")
+                print("   Please return to terminal after testing to continue")
+        except (EOFError, KeyboardInterrupt):
+            print("   Skipping test (non-interactive environment)")
         
-        run_command(test_cmd, "Testing execution")
-        print("   Please return to terminal after testing to continue")
-    
-    # Distribution package creation option
-    print("\n📦 Would you like to create a distribution package?")
-    package_choice = input("   y/n (default: n): ").strip().lower()
-    
-    if package_choice == 'y':
-        create_distribution_package()
+        # Distribution package creation option (only in interactive environment)
+        print("\n📦 Would you like to create a distribution package?")
+        try:
+            package_choice = input("   y/n (default: n): ").strip().lower()
+            
+            if package_choice == 'y':
+                create_distribution_package()
+        except (EOFError, KeyboardInterrupt):
+            print("   Skipping package creation (non-interactive environment)")
+    else:
+        print("\n🤖 CI/CD environment detected - skipping interactive prompts")
     
     print("\n" + "=" * 70)
     print("🎉 Build Complete!")
     print("=" * 70)
     print(f"📁 Results location: {os.path.abspath('dist')}")
-    print("📋 Next steps:")
-    print("   1. Test executable in dist/ folder")
-    print("   2. Distribute to users")
-    print("   3. Provide INSTALLATION_GUIDE.md document")
+    
+    if is_ci:
+        print("🤖 CI/CD Build Summary:")
+        print("   ✅ Executable built successfully")
+        print("   📦 Ready for GitHub Actions artifact upload")
+        print("   🚀 Will be packaged in GitHub Release")
+    else:
+        print("📋 Next steps:")
+        print("   1. Test executable in dist/ folder")
+        print("   2. Distribute to users")
+        print("   3. Provide INSTALLATION_GUIDE.md document")
+    
     print("=" * 70)
     
     return 0
