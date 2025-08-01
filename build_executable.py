@@ -221,11 +221,99 @@ def main():
     print("\n🧹 Cleaning previous builds...")
     cleanup_build()
     
-    # Create spec file
-    spec_file = create_spec_file()
-    
-    # Build command
-    build_cmd = ['pyinstaller', '--clean', '--noconfirm', spec_file]
+    # Build command with direct data file inclusion
+    if current_platform == "Windows":
+        # Windows uses semicolon as separator
+        build_cmd = [
+            'pyinstaller',
+            '--clean',
+            '--noconfirm',
+            '--add-data', 'src/resources;resources',
+            '--add-data', 'src/streamlit_app.py;.',
+            '--add-data', 'src/keyword_generator.py;src',
+            '--hidden-import', 'streamlit',
+            '--hidden-import', 'streamlit.web.cli',
+            '--hidden-import', 'streamlit.runtime.scriptrunner.script_runner',
+            '--hidden-import', 'streamlit.runtime.state',
+            '--hidden-import', 'streamlit.components.v1',
+            '--hidden-import', 'pandas',
+            '--hidden-import', 'openpyxl',
+            '--hidden-import', 'xlrd',
+            '--hidden-import', 'numpy',
+            '--hidden-import', 'psutil',
+            '--hidden-import', 'webbrowser',
+            '--exclude-module', 'matplotlib',
+            '--exclude-module', 'scipy',
+            '--exclude-module', 'sklearn',
+            '--exclude-module', 'tensorflow',
+            '--exclude-module', 'torch',
+            '--exclude-module', 'cv2',
+            '--name', 'KeywordGenerator',
+            '--console',
+            'src/launcher.py'
+        ]
+    else:
+        # macOS/Linux uses colon as separator
+        if current_platform == "Darwin":
+            # macOS: create app bundle
+            build_cmd = [
+                'pyinstaller',
+                '--clean',
+                '--noconfirm',
+                '--add-data', 'src/resources:resources',
+                '--add-data', 'src/streamlit_app.py:.',
+                '--add-data', 'src/keyword_generator.py:src',
+                '--hidden-import', 'streamlit',
+                '--hidden-import', 'streamlit.web.cli',
+                '--hidden-import', 'streamlit.runtime.scriptrunner.script_runner',
+                '--hidden-import', 'streamlit.runtime.state',
+                '--hidden-import', 'streamlit.components.v1',
+                '--hidden-import', 'pandas',
+                '--hidden-import', 'openpyxl',
+                '--hidden-import', 'xlrd',
+                '--hidden-import', 'numpy',
+                '--hidden-import', 'psutil',
+                '--hidden-import', 'webbrowser',
+                '--exclude-module', 'matplotlib',
+                '--exclude-module', 'scipy',
+                '--exclude-module', 'sklearn',
+                '--exclude-module', 'tensorflow',
+                '--exclude-module', 'torch',
+                '--exclude-module', 'cv2',
+                '--name', 'KeywordGenerator',
+                '--windowed',
+                'src/launcher.py'
+            ]
+        else:
+            # Linux: console mode
+            build_cmd = [
+                'pyinstaller',
+                '--clean',
+                '--noconfirm',
+                '--add-data', 'src/resources:resources',
+                '--add-data', 'src/streamlit_app.py:.',
+                '--add-data', 'src/keyword_generator.py:src',
+                '--hidden-import', 'streamlit',
+                '--hidden-import', 'streamlit.web.cli',
+                '--hidden-import', 'streamlit.runtime.scriptrunner.script_runner',
+                '--hidden-import', 'streamlit.runtime.state',
+                '--hidden-import', 'streamlit.components.v1',
+                '--hidden-import', 'pandas',
+                '--hidden-import', 'openpyxl',
+                '--hidden-import', 'xlrd',
+                '--hidden-import', 'numpy',
+                '--hidden-import', 'psutil',
+                '--hidden-import', 'webbrowser',
+                '--exclude-module', 'matplotlib',
+                '--exclude-module', 'scipy',
+                '--exclude-module', 'sklearn',
+                '--exclude-module', 'tensorflow',
+                '--exclude-module', 'torch',
+                '--exclude-module', 'cv2',
+                '--name', 'KeywordGenerator',
+                '--console',
+                'src/launcher.py'
+            ]
     
     if not run_command(build_cmd, "Building executable"):
         return 1
