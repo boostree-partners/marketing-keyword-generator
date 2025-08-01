@@ -42,16 +42,16 @@ jobs:
           PYTHONIOENCODING: utf-8
 
       - name: 📊 빌드 결과 확인
-                 run: |
-           echo "=== Build Results ==="
-           dir dist
-           if (Test-Path "dist/KeywordGenerator.exe") {
-             $fileSize = (Get-Item "dist/KeywordGenerator.exe").Length / 1MB
-             echo "✅ KeywordGenerator.exe created successfully ($([math]::Round($fileSize, 1)) MB)"
-           } else {
-             echo "❌ Executable build failed"
-             exit 1
-           }
+        run: |
+          echo "=== Build Results ==="
+          dir dist
+          if (Test-Path "dist/KeywordGenerator.exe") {
+            $fileSize = (Get-Item "dist/KeywordGenerator.exe").Length / 1MB
+            echo "✅ KeywordGenerator.exe created successfully ($([math]::Round($fileSize, 1)) MB)"
+          } else {
+            echo "❌ Executable build failed"
+            exit 1
+          }
         shell: powershell
 
       - name: 📁 아티팩트 업로드
@@ -90,16 +90,16 @@ jobs:
           PYTHONIOENCODING: utf-8
 
       - name: 📊 빌드 결과 확인
-                 run: |
-           echo "=== Build Results ==="
-           ls -la dist/
-           if [ -d "dist/KeywordGenerator.app" ]; then
-             appSize=$(du -sh "dist/KeywordGenerator.app" | cut -f1)
-             echo "✅ KeywordGenerator.app created successfully ($appSize)"
-           else
-             echo "❌ App bundle build failed"
-             exit 1
-           fi
+        run: |
+          echo "=== Build Results ==="
+          ls -la dist/
+          if [ -d "dist/KeywordGenerator.app" ]; then
+            appSize=$(du -sh "dist/KeywordGenerator.app" | cut -f1)
+            echo "✅ KeywordGenerator.app created successfully ($appSize)"
+          else
+            echo "❌ App bundle build failed"
+            exit 1
+          fi
 
       - name: 📁 아티팩트 업로드
         uses: actions/upload-artifact@v3
