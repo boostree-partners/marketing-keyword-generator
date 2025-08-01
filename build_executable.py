@@ -81,8 +81,9 @@ streamlit_data = collect_data_files('streamlit')
 # Additional data files
 datas = [
     ('src/resources', 'resources'),
-    ('src/streamlit_app.py', 'src'),
+    ('src/streamlit_app.py', '.'),  # 루트 디렉토리에 복사
     ('src/keyword_generator.py', 'src'),
+    ('src/launcher.py', 'src'),  # 런처도 포함
 ] + streamlit_data
 
 # Add output directory only if it exists

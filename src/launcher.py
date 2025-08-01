@@ -74,7 +74,7 @@ def main():
     
     # streamlit_app.py 경로 찾기
     app_paths = [
-        os.path.join(script_dir, 'streamlit_app.py'),  # 같은 디렉토리
+        os.path.join(script_dir, 'streamlit_app.py'),  # PyInstaller에서 복사된 위치 (루트)
         os.path.join(script_dir, 'src', 'streamlit_app.py'),  # src 서브디렉토리
         os.path.join(script_dir, '..', 'src', 'streamlit_app.py'),  # 상위/src
     ]
@@ -89,7 +89,15 @@ def main():
         print("❌ 오류: streamlit_app.py 파일을 찾을 수 없습니다")
         print("   다음 위치를 확인했습니다:")
         for path in app_paths:
-            print(f"   - {path}")
+            exists = "✅ 존재" if os.path.exists(path) else "❌ 없음"
+            print(f"   - {path} ({exists})")
+        
+        # 디버깅 정보 추가
+        print(f"\n🔍 디버깅 정보:")
+        print(f"   실행 파일 위치: {sys.executable}")
+        print(f"   스크립트 디렉토리: {script_dir}")
+        print(f"   현재 작업 디렉토리: {os.getcwd()}")
+        
         input("\n엔터를 눌러 종료...")
         return 1
     
