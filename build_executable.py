@@ -81,10 +81,13 @@ streamlit_data = collect_data_files('streamlit')
 # Additional data files
 datas = [
     ('src/resources', 'resources'),
-    ('src/output', 'output'),
     ('src/streamlit_app.py', 'src'),
     ('src/keyword_generator.py', 'src'),
 ] + streamlit_data
+
+# Add output directory only if it exists
+if os.path.exists('src/output'):
+    datas.append(('src/output', 'output'))
 
 # Hidden imports for Streamlit
 hiddenimports = [

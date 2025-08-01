@@ -64,10 +64,10 @@ $RECYCLE.BIN/
 *.spec
 build_*.log
 
-# Output files
-src/output/keyword_combinations_*.xlsx
+# Output files (keep directory but ignore generated files)
+src/output/*.xlsx
 keyword_combinations_*.xlsx
-output/
+!src/output/.gitkeep
 
 # Test files (keep sample files but ignore test outputs)
 test_*.xlsx
