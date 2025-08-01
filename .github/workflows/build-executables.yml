@@ -137,22 +137,22 @@ jobs:
           VERSION=${GITHUB_REF#refs/tags/}
           DATE=$(date +%Y%m%d)
 
-                     # Windows package
-           mkdir -p release/keyword_generator_windows_${VERSION}
-           cp windows-build/dist/KeywordGenerator.exe release/keyword_generator_windows_${VERSION}/
-           cp INSTALLATION_GUIDE.md release/keyword_generator_windows_${VERSION}/
-           cp -r src/resources release/keyword_generator_windows_${VERSION}/sample_files/ 2>/dev/null || echo "No sample files"
+          # Windows package
+          mkdir -p release/keyword_generator_windows_${VERSION}
+          cp windows-build/dist/KeywordGenerator.exe release/keyword_generator_windows_${VERSION}/
+          cp INSTALLATION_GUIDE.md release/keyword_generator_windows_${VERSION}/
+          cp -r src/resources release/keyword_generator_windows_${VERSION}/sample_files/ 2>/dev/null || echo "No sample files"
 
-           # macOS package  
-           mkdir -p release/keyword_generator_macos_${VERSION}
-           cp -r macos-build/dist/KeywordGenerator.app release/keyword_generator_macos_${VERSION}/
-           cp INSTALLATION_GUIDE.md release/keyword_generator_macos_${VERSION}/
-           cp -r src/resources release/keyword_generator_macos_${VERSION}/sample_files/ 2>/dev/null || echo "No sample files"
+          # macOS package  
+          mkdir -p release/keyword_generator_macos_${VERSION}
+          cp -r macos-build/dist/KeywordGenerator.app release/keyword_generator_macos_${VERSION}/
+          cp INSTALLATION_GUIDE.md release/keyword_generator_macos_${VERSION}/
+          cp -r src/resources release/keyword_generator_macos_${VERSION}/sample_files/ 2>/dev/null || echo "No sample files"
 
-           # ZIP compression
-           cd release
-           zip -r keyword_generator_windows_${VERSION}.zip keyword_generator_windows_${VERSION}/
-           zip -r keyword_generator_macos_${VERSION}.zip keyword_generator_macos_${VERSION}/
+          # ZIP compression
+          cd release
+          zip -r keyword_generator_windows_${VERSION}.zip keyword_generator_windows_${VERSION}/
+          zip -r keyword_generator_macos_${VERSION}.zip keyword_generator_macos_${VERSION}/
 
           echo "✅ 배포 패키지 생성 완료"
           ls -la *.zip
@@ -162,32 +162,32 @@ jobs:
         with:
           files: |
             release/*.zip
-                   name: 'Keyword Generator ${{ github.ref_name }}'
-         body: |
-           ## 🎉 Keyword Generator ${{ github.ref_name }} Release
+          name: 'Keyword Generator ${{ github.ref_name }}'
+          body: |
+            ## 🎉 Keyword Generator ${{ github.ref_name }} Release
 
-           ### 📦 Download
-           - **Windows Users**: `keyword_generator_windows_${{ github.ref_name }}.zip`
-           - **macOS Users**: `keyword_generator_macos_${{ github.ref_name }}.zip`
+            ### 📦 Download
+            - **Windows Users**: `keyword_generator_windows_${{ github.ref_name }}.zip`
+            - **macOS Users**: `keyword_generator_macos_${{ github.ref_name }}.zip`
 
-           ### ✨ Key Features
-           - 🔥 Excel file-based keyword combination generation
-           - 🌐 Browser-based user interface
-           - 📊 Real-time statistics and preview
-           - 📁 Group-based Excel sheet output
-           - 🔄 Support for various file sizes
+            ### ✨ Key Features
+            - 🔥 Excel file-based keyword combination generation
+            - 🌐 Browser-based user interface
+            - 📊 Real-time statistics and preview
+            - 📁 Group-based Excel sheet output
+            - 🔄 Support for various file sizes
 
-           ### 🚀 How to Use
-           1. Download and extract ZIP file
-           2. Double-click executable file
-           3. Upload Excel file in browser
-           4. Generate keyword combinations and download
+            ### 🚀 How to Use
+            1. Download and extract ZIP file
+            2. Double-click executable file
+            3. Upload Excel file in browser
+            4. Generate keyword combinations and download
 
-           ### 📋 System Requirements
-           - **Windows**: Windows 10 or later
-           - **macOS**: macOS 10.14 or later
+            ### 📋 System Requirements
+            - **Windows**: Windows 10 or later
+            - **macOS**: macOS 10.14 or later
 
-           📖 For detailed usage, see `INSTALLATION_GUIDE.md`
+            📖 For detailed usage, see `INSTALLATION_GUIDE.md`
           draft: false
           prerelease: false
         env:
@@ -201,15 +201,15 @@ jobs:
 
     steps:
       - name: 📊 빌드 결과 요약
-                 run: |
-           echo "=== 🚀 Cross-Platform Build Complete ==="
-           echo "Windows Build: ${{ needs.build-windows.result }}"
-           echo "macOS Build: ${{ needs.build-macos.result }}"
+        run: |
+          echo "=== 🚀 Cross-Platform Build Complete ==="
+          echo "Windows Build: ${{ needs.build-windows.result }}"
+          echo "macOS Build: ${{ needs.build-macos.result }}"
 
-           if [[ "${{ needs.build-windows.result }}" == "success" && "${{ needs.build-macos.result }}" == "success" ]]; then
-             echo "✅ All platform builds successful!"
-             echo "📁 Executables available for download in Actions tab"
-           else
-             echo "❌ Some builds failed"
-             exit 1
-           fi
+          if [[ "${{ needs.build-windows.result }}" == "success" && "${{ needs.build-macos.result }}" == "success" ]]; then
+            echo "✅ All platform builds successful!"
+            echo "📁 Executables available for download in Actions tab"
+          else
+            echo "❌ Some builds failed"
+            exit 1
+          fi
