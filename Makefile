@@ -1,4 +1,4 @@
-.PHONY: run setup clean clean-build clean-all help generate test examples web webapp build package
+.PHONY: run setup clean clean-build clean-all help generate test examples web webapp
 
 # 기본 변수 설정
 INPUT_FILE ?= resources/미소구글SA구조개편_07.30.xlsx
@@ -84,24 +84,7 @@ clean-build:
 clean-all: clean clean-build
 	@echo "🧹 전체 정리 완료!"
 
-# 빌드 환경 정보
-build-info:
-	@echo "🔍 Build Environment Info:"
-	@echo "   Platform: $(shell uname -s 2>/dev/null || echo 'Windows')"
-	@echo "   Architecture: $(shell uname -m 2>/dev/null || echo 'Unknown')"
-	@echo "   Python Version: $(shell python --version 2>/dev/null || echo 'Python needed')"
-	@echo ""
-	@echo "🚀 Recommended Build Method: GitHub Actions"
-	@echo ""
-	@echo "✅ Cross-platform builds (Windows + macOS):"
-	@echo "   1. Tag release: git tag v1.0.0 && git push origin v1.0.0"
-	@echo "   2. Manual: GitHub → Actions → Run workflow"
-	@echo ""
-	@echo "📁 Results available at:"
-	@echo "   - GitHub Releases (tagged builds)"
-	@echo "   - GitHub Actions Artifacts (manual builds)"
-	@echo ""
-	@echo "📖 Detailed guide: WINDOWS_BUILD_GUIDE.md"
+
 
 # 개발 환경 초기화
 dev-setup:
@@ -117,11 +100,7 @@ test: setup
 	@echo ""
 	@. venv/bin/activate && cd src && python keyword_generator.py --version
 
-# 빌드 스크립트 테스트 (GitHub Actions 시뮬레이션)
-test-build:
-	@echo "🧪 Testing build script for GitHub Actions..."
-	@python test_build_local.py
-	@echo "✅ Build script test completed!"
+
 
 # 사용 예시 보기
 examples:
@@ -135,11 +114,7 @@ examples:
 	@echo "   make web"
 	@echo "   make webapp"
 	@echo ""
-	@echo "🔹 실행파일 빌드 (배포용) - GitHub Actions:"
-	@echo "   git tag v1.0.0 && git push origin v1.0.0  # 자동 릴리즈 빌드"
-	@echo "   make build          # GitHub Actions 사용법 안내"
-	@echo "   make build-info     # 빌드 환경 및 방법 안내"
-	@echo ""
+
 	@echo "🔹 특정 파일 사용:"
 	@echo "   make file FILE=data/my_keywords.xlsx"
 	@echo "   make file FILE=/absolute/path/to/file.xlsx"
@@ -159,30 +134,7 @@ examples:
 	@echo "   make clean              # 기본 출력 폴더 정리"
 	@echo "   make clean DIR=my_dir   # 특정 디렉토리 정리"
 
-# GitHub Actions로 실행파일 빌드 (권장)
-build:
-	@echo "🚀 GitHub Actions Build (Recommended)"
-	@echo ""
-	@echo "✨ For automatic cross-platform builds, use GitHub Actions:"
-	@echo ""
-	@echo "🏷️  Release build (automatic):"
-	@echo "   git tag v1.0.0"
-	@echo "   git push origin v1.0.0"
-	@echo ""
-	@echo "🔧 Manual build:"
-	@echo "   Go to: GitHub → Actions → 'Build Cross-Platform Executables' → Run workflow"
-	@echo ""
-	@echo "📁 Download results from:"
-	@echo "   - GitHub Releases (for tagged builds)"
-	@echo "   - GitHub Actions → Artifacts (for manual builds)"
-	@echo ""
-	@echo "💡 This ensures consistent builds across all platforms!"
 
-# GitHub Actions 빌드 안내
-package: build
-	@echo ""
-	@echo "📦 Package files will be automatically created by GitHub Actions"
-	@echo "   and available in the Releases section"
 
 # 도움말
 help:
@@ -197,10 +149,7 @@ help:
 	@echo "   make clean      - 출력 파일 정리"
 	@echo "   make dev-setup  - 개발 환경 초기화"
 	@echo ""
-	@echo "📦 배포 명령어:"
-	@echo "   make build      - 실행파일 빌드 (더블클릭 실행 가능)"
-	@echo "   make package    - 배포 패키지 생성"
-	@echo ""
+
 	@echo "🧹 정리 명령어:"
 	@echo "   make clean      - 출력 파일 정리"
 	@echo "   make clean-build - 빌드 파일 정리"

@@ -1,372 +1,208 @@
-# Keyword Generator 🚀
+# 🔤 키워드 조합 생성기
 
-A CLI tool that automatically generates keyword combinations based on rules defined in Excel files.
+엑셀 파일에서 키워드 데이터를 읽어와 조합 규칙에 따라 새로운 키워드 조합을 생성하는 도구입니다.
 
-## 📖 Table of Contents
+## ✨ 주요 기능
 
-- [Features](#features)
-- [Quick Start](#quick-start)
-- [Project Structure](#project-structure)
-- [Installation](#installation)
-- [Usage](#usage)
-- [Excel File Format](#excel-file-format)
-- [Output Format](#output-format)
-- [Build & Distribution](#build--distribution)
-- [Troubleshooting](#troubleshooting)
+- 📊 **엑셀 파일 읽기**: 구조화된 키워드 데이터 로드
+- 🔄 **조합 규칙 처리**: A열의 숫자 규칙에 따른 컬럼 조합
+- 📈 **다양한 출력 형식**: 대시보드, 그룹별 시트, 상세 결과
+- 🌐 **웹 인터페이스**: Streamlit 기반 사용자 친화적 UI
+- 💻 **명령행 인터페이스**: CLI를 통한 배치 처리
 
-## ✨ Features
+## 🚀 빠른 시작
 
-- 🔥 **Excel-based keyword generation**: Generate thousands of keyword combinations from Excel files
-- 🌐 **Browser-based UI**: User-friendly web interface using Streamlit
-- 📊 **Real-time statistics**: View generation progress and results
-- 📁 **Group-based organization**: Organize keywords by groups with separate Excel sheets
-- 🔄 **Flexible file sizes**: Support for various Excel file sizes (3+ rows, 3+ columns)
-- 📦 **Cross-platform executables**: Available for both Windows and macOS
-- 🚀 **Multiple interfaces**: CLI, web app, and standalone executable options
-
-## 🚀 Quick Start
-
-### Method 1: Download Executable (Recommended)
-
-1. Download the latest release for your platform:
-   - **Windows**: `keyword_generator_windows_vX.X.X.zip`
-   - **macOS**: `keyword_generator_macos_vX.X.X.zip`
-2. Extract and double-click the executable
-3. Upload your Excel file in the browser
-4. Generate and download keyword combinations
-
-### Method 2: Run from Source
-
+### 1. 환경 설정
 ```bash
-# Clone repository
-git clone https://github.com/your-repo/keyword-generator.git
+# 저장소 클론
+git clone <repository-url>
 cd keyword-generator
 
-# Setup environment
+# 가상환경 설정 및 패키지 설치
 make setup
-
-# Run web application
-make web
 ```
 
-## 📁 Project Structure
+### 2. 웹앱 실행 (권장)
+```bash
+make web
+```
+브라우저에서 `http://localhost:8501`로 접속하여 사용하세요.
+
+### 3. 명령행 실행
+```bash
+# 기본 파일로 실행
+make run
+
+# 특정 파일 지정
+make file FILE=resources/my_data.xlsx
+
+# 출력 디렉토리 지정
+make output DIR=my_results
+```
+
+## 📁 프로젝트 구조
 
 ```
 keyword-generator/
 ├── src/
-│   ├── resources/
-│   │   ├── sample_keywords.xlsx           # Sample data file
-│   │   └── test.xlsx                      # Test file
-│   ├── output/                            # Generated keyword files
-│   ├── keyword_generator.py               # Main script
-│   ├── streamlit_app.py                   # Web UI
-│   └── launcher.py                        # Executable launcher
-├── .github/workflows/
-│   └── build-executables.yml             # Auto-build configuration
-├── venv/                                  # Python virtual environment
-├── Makefile                               # CLI commands
-├── build_executable.py                    # Build script
-├── requirements.txt                       # Dependencies
-├── INSTALLATION_GUIDE.md                 # User guide
-├── WINDOWS_BUILD_GUIDE.md                # Build guide
-└── README.md                             # This file
+│   ├── keyword_generator.py    # 핵심 로직
+│   ├── streamlit_app.py        # 웹 인터페이스
+│   ├── resources/              # 입력 파일들
+│   │   └── sample_keywords.xlsx
+│   └── output/                 # 결과 파일들
+├── requirements.txt            # Python 패키지 의존성
+├── Makefile                   # 빌드 및 실행 명령어
+└── README.md                  # 이 파일
 ```
 
-## 🛠️ Installation
+## 📊 입력 파일 형식
 
-### Prerequisites
+엑셀 파일은 다음과 같은 구조를 가져야 합니다:
 
-- Python 3.8 or higher
-- pip package manager
+| A열 (조합규칙) | B열 | C열 (1) | D열 (2) | E열 (3) | ... |
+|---------------|-----|---------|---------|---------|-----|
+| 2,3           | 그룹1 | 키워드1 | 키워드1 | 키워드1 | ... |
+| 1,4           | 그룹2 | 키워드2 | 키워드2 | 키워드2 | ... |
+| ...           | ...  | ...     | ...     | ...     | ... |
 
-### Setup Commands
+### 규칙 설명
+- **1행**: 각 컬럼의 번호 (C=1, D=2, E=3, ...)
+- **2행**: 카테고리 제목
+- **3행부터**: 실제 키워드 데이터
+- **A열**: 조합 규칙 (예: "2,3" = D열과 E열 조합)
 
+## 🎯 사용법
+
+### 웹 인터페이스 (권장)
+1. `make web` 실행
+2. 브라우저에서 파일 업로드
+3. 설정 조정 및 결과 확인
+4. 결과 파일 다운로드
+
+### 명령행 사용법
 ```bash
-# Basic setup
-make setup
-
-# Development setup
-make dev-setup
-
-# Clean install
-make clean && make setup
-```
-
-## 📖 Usage
-
-### Web Application (Recommended)
-
-```bash
-# Start web application
-make web
-
-# Or manually
-streamlit run src/streamlit_app.py
-```
-
-### Command Line Interface
-
-```bash
-# Basic usage with default files
+# 기본 실행
 make run
 
-# Specify input file
+# 특정 파일 사용
 make file FILE=path/to/your/file.xlsx
 
-# Specify output directory
-make output DIR=path/to/output
+# 출력 디렉토리 지정
+make output DIR=results
 
-# Custom input and output
-make custom INPUT=data.xlsx OUTPUT=results/
+# 파일과 출력 모두 지정
+make custom FILE=input.xlsx DIR=output_dir
 ```
 
-### Available Commands
+## 📈 출력 형식
 
+생성되는 엑셀 파일은 다음 시트들을 포함합니다:
+
+1. **Dashboard**: 전체 통계 및 요약
+2. **Group별 시트**: 각 그룹의 키워드 조합
+3. **Detailed Results**: 모든 조합의 상세 정보
+
+### 출력 컬럼
+- **Rule**: 적용된 조합 규칙
+- **Group**: 키워드 그룹명
+- **Columns**: 사용된 컬럼 번호
+- **Keyword**: 생성된 키워드 조합
+- **Components**: 원본 키워드들
+
+## 🛠️ 개발 환경
+
+### 필수 요구사항
+- Python 3.8 이상
+- macOS, Windows, Linux 지원
+
+### 설치된 패키지
+- `pandas`: 데이터 처리
+- `openpyxl`: 엑셀 파일 읽기/쓰기
+- `xlrd`: 엑셀 파일 읽기
+- `streamlit`: 웹 인터페이스
+- `numpy`: 수치 계산
+
+### 개발 명령어
 ```bash
-make help        # Show all available commands
-make examples    # Show usage examples
-make test        # Run basic tests
-make clean       # Clean temporary files
-make build       # Build executable
-make build-info  # Show build environment info
-```
+# 개발 환경 초기화
+make dev-setup
 
-## 📊 Excel File Format
-
-Your Excel file should follow this structure:
-
-### Required Format
-
-```
-Row 1: [Rule] [Group] [2] [3] [4] ... [N]           ← Column numbers
-Row 2: [Rule] [Group] [Brand] [General] ... [Cat]   ← Category titles
-Row 3: [2,3,4] [SEO] [clinic] [beauty] [cheap]      ← Actual data
-Row 4: [2,3] [Main] [spa] [facial] [premium]        ← More data
-...
-```
-
-### Example
-
-| A (Rule) | B (Group) | C (Brand) | D (General) | E (Price)  |
-| -------- | --------- | --------- | ----------- | ---------- |
-| 2,3,4    | SEO       | clinic    | beauty      | cheap      |
-| 2,3      | Main      | spa       | facial      | premium    |
-| 2,4      | Budget    | center    | treatment   | affordable |
-
-### Rules
-
-- **Column A**: Combination rules (e.g., "2,3,4" means combine columns C, D, E)
-- **Column B**: Group names for organization
-- **Columns C+**: Keyword categories and values
-- **Row 1**: Column reference numbers (2, 3, 4, ...)
-- **Row 2**: Category names (Brand, General, Price, ...)
-- **Row 3+**: Actual keyword data
-
-## 📋 Output Format
-
-### Generated Files
-
-The tool creates Excel files with multiple sheets:
-
-#### Dashboard Sheet
-
-- Total keyword count
-- Group statistics
-- Generation timestamp
-- Rule summaries
-
-#### Group Sheets
-
-- Separate sheet for each group (SEO, Main, Budget, etc.)
-- Columns: Rule, Group, Categories, Keyword, Components
-- Filtered data for easy analysis
-
-### Example Output
-
-```
-keyword_combinations_20241201_143022.xlsx
-├── Dashboard          # Statistics and summary
-├── SEO               # SEO group keywords
-├── Main              # Main group keywords
-└── Budget            # Budget group keywords
-```
-
-## 🔨 Build & Distribution
-
-### 🚀 GitHub Actions (Recommended)
-
-All builds are handled by GitHub Actions for consistency across platforms:
-
-#### **Automatic Release Builds**
-
-```bash
-# Create and push a version tag
-git tag v1.0.0
-git push origin v1.0.0
-
-# GitHub Actions will automatically:
-# 1. Build Windows .exe and macOS .app
-# 2. Create release packages
-# 3. Publish to GitHub Releases
-```
-
-#### **Manual Builds**
-
-```bash
-# Go to GitHub repository
-# → Actions tab
-# → "Build Cross-Platform Executables"
-# → "Run workflow" button
-# → Download from Artifacts section
-```
-
-#### **Local Build Info**
-
-```bash
-# Check build environment and get GitHub Actions guidance
-make build-info
-
-# Show GitHub Actions usage instructions
-make build
-```
-
-### Build Results
-
-- **Windows**: `KeywordGenerator.exe` (standalone executable)
-- **macOS**: `KeywordGenerator.app` (application bundle)
-- **Packages**: `keyword_generator_windows_vX.X.X.zip` and `keyword_generator_macos_vX.X.X.zip`
-- **Documentation**: Included installation guides and sample files
-
-## 🔧 System Requirements
-
-### Minimum Requirements
-
-- **OS**: Windows 10+ or macOS 10.14+
-- **RAM**: 4GB (8GB recommended)
-- **Storage**: 500MB free space
-- **Browser**: Chrome, Firefox, Safari, or Edge
-
-### Performance Guidelines
-
-| File Size | Rows   | Processing Time | Memory Usage |
-| --------- | ------ | --------------- | ------------ |
-| Small     | <50    | <30 seconds     | <100MB       |
-| Medium    | 50-200 | 1-5 minutes     | 100-500MB    |
-| Large     | >200   | 5+ minutes      | >500MB       |
-
-## 🛠️ Troubleshooting
-
-### Common Issues
-
-#### "File not found" error
-
-```bash
-# Check file path
-ls -la path/to/file.xlsx
-
-# Use absolute path
-make file FILE=/absolute/path/to/file.xlsx
-```
-
-#### Empty output
-
-- Verify Excel file format
-- Check combination rules reference existing columns
-- Ensure data rows have content
-
-#### Memory issues
-
-- Close other applications
-- Use smaller files for testing
-- Restart application between large files
-
-#### Permission errors (macOS)
-
-```bash
-# Allow unsigned applications
-sudo spctl --master-disable
-
-# Or right-click app → Open
-```
-
-#### Antivirus false positive (Windows)
-
-- Add executable to antivirus exceptions
-- Windows Defender → Virus & threat protection → Exclusions
-
-### Getting Help
-
-- 📧 [GitHub Issues](https://github.com/your-repo/keyword-generator/issues)
-- 📖 [Installation Guide](INSTALLATION_GUIDE.md)
-- 🔨 [Build Guide](WINDOWS_BUILD_GUIDE.md)
-
-## 🔄 Development
-
-### Contributing
-
-```bash
-# Fork repository
-# Create feature branch
-git checkout -b feature/amazing-feature
-
-# Make changes and test
+# 기능 테스트
 make test
 
-# Commit and push
-git commit -m "Add amazing feature"
-git push origin feature/amazing-feature
-
-# Create Pull Request
+# 정리
+make clean          # 출력 파일 정리
+make clean-build    # 빌드 파일 정리
+make clean-all      # 전체 정리
 ```
 
-### Testing
+## 📋 Makefile 명령어
 
+| 명령어 | 설명 |
+|--------|------|
+| `make web` | Streamlit 웹앱 실행 |
+| `make run` | 기본 파일로 키워드 생성 |
+| `make file FILE=파일명` | 특정 파일로 실행 |
+| `make output DIR=디렉토리` | 출력 디렉토리 지정 |
+| `make setup` | 가상환경 설정 |
+| `make clean` | 출력 파일 정리 |
+| `make help` | 도움말 표시 |
+
+## 🔧 고급 사용법
+
+### 환경 변수 설정
 ```bash
-# Run basic tests
-make test
+# 입력 파일 변경
+make run INPUT_FILE=my_data.xlsx
 
-# Test with sample file
-make file FILE=src/resources/sample_keywords.xlsx
-
-# Clean and test
-make clean && make setup && make test
+# 출력 디렉토리 변경
+make run OUTPUT_DIR=results
 ```
 
-## 📝 Changelog
+### 직접 Python 실행
+```bash
+# 가상환경 활성화
+source venv/bin/activate
 
-### Latest Changes
+# 직접 실행
+cd src && python keyword_generator.py --input file.xlsx --output results
+```
 
-- ✨ Cross-platform executable support
-- 🌐 Browser-based user interface
-- 📊 Real-time statistics and preview
-- 🔄 Flexible file size support
-- 📁 Group-based Excel organization
+## 🐛 문제 해결
 
-### Version History
+### 일반적인 문제들
 
-See [GitHub Releases](https://github.com/your-repo/keyword-generator/releases) for detailed version history.
+**Q: "File not found" 오류**
+A: 입력 파일 경로를 확인하고 `resources/` 폴더에 파일이 있는지 확인하세요.
 
-## 📄 License
+**Q: 웹앱이 시작되지 않음**
+A: 포트 8501이 사용 중인지 확인하고, 다른 포트를 사용해보세요.
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+**Q: 메모리 부족 오류**
+A: 큰 파일의 경우 웹 인터페이스보다 명령행 실행을 권장합니다.
 
-## 🎯 Usage Examples
+### 로그 확인
+```bash
+# 상세 로그와 함께 실행
+make run 2>&1 | tee log.txt
+```
 
-### Business Use Cases
+## 📝 라이선스
 
-- **SEO keyword research**: Generate variations for search optimization
-- **Ad campaign creation**: Create keyword combinations for advertising
-- **Content planning**: Generate topic variations for content creation
-- **Market research**: Analyze keyword combinations for different segments
+이 프로젝트는 MIT 라이선스 하에 배포됩니다.
 
-### Sample Workflow
+## 🤝 기여하기
 
-1. **Prepare Excel file** with your keyword categories
-2. **Define combination rules** (which categories to combine)
-3. **Run the generator** via web interface or CLI
-4. **Download results** organized by groups
-5. **Use generated keywords** in your projects
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
+
+## 📞 지원
+
+문제가 발생하거나 질문이 있으시면 이슈를 생성해주세요.
 
 ---
 
-**🚀 Ready to generate thousands of keyword combinations? Get started with the [Quick Start](#quick-start) guide!**
+**키워드 생성기로 더 나은 마케팅 콘텐츠를 만들어보세요!** 🚀
