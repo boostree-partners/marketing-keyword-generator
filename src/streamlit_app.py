@@ -184,21 +184,40 @@ def create_dashboard_data(results_df):
     
     return dashboard_data
 
-def create_excel_download(results_df):
+def create_excel_download(results_df, progress_bar=None, status_text=None):
     """엑셀 파일을 메모리에서 생성하여 다운로드 가능한 형태로 반환"""
     buffer = io.BytesIO()
     
     # ExcelWriter로 여러 시트 생성
     with pd.ExcelWriter(buffer, engine='openpyxl') as writer:
         # Dashboard 시트
+        if status_text:
+            status_text.text("📊 Dashboard 시트 생성 중...")
         dashboard_data = create_dashboard_data(results_df)
         dashboard_df = pd.DataFrame(dashboard_data, columns=['항목', '값'])
         dashboard_df.to_excel(writer, sheet_name='Dashboard', index=False)
         
+        if progress_bar:
+            progress_bar.progress(30)
+        
         # 그룹별 시트 생성
-        for group in results_df['group'].unique():
+        unique_groups = results_df['group'].unique()
+        total_groups = len(unique_groups)
+        
+        for i, group in enumerate(unique_groups):
+            if status_text:
+                status_text.text(f"📋 {group} 그룹 시트 생성 중... ({i+1}/{total_groups})")
+            
             group_data = results_df[results_df['group'] == group]
             group_data.to_excel(writer, sheet_name=group, index=False)
+            
+            if progress_bar:
+                # 30%에서 90%까지 그룹별로 진행
+                progress = 30 + (i + 1) / total_groups * 60
+                progress_bar.progress(int(progress))
+    
+    if progress_bar:
+        progress_bar.progress(100)
     
     buffer.seek(0)
     return buffer.getvalue()
@@ -219,6 +238,12 @@ def main():
         st.session_state.file_processed = False
     if 'current_file_name' not in st.session_state:
         st.session_state.current_file_name = None
+    if 'excel_data' not in st.session_state:
+        st.session_state.excel_data = None
+    if 'excel_filename' not in st.session_state:
+        st.session_state.excel_filename = None
+    if 'reset_uploader' not in st.session_state:
+        st.session_state.reset_uploader = False
     
     # 메인 헤더
     st.title("🔤 키워드 조합 생성기")
@@ -241,8 +266,24 @@ def main():
            - 엑셀 파일로 결과를 다운로드하세요
         """)
         
+        # 양식 다운로드 버튼 추가
         st.markdown("---")
-        st.markdown("**💡 팁:** 파일은 로컬에서 처리되므로 인터넷 연결이 필요하지 않습니다!")
+        st.markdown("**📥 양식 다운로드**")
+        # sample_template.xlsx 파일을 읽어서 다운로드 버튼 생성
+        template_path = os.path.join(os.path.dirname(__file__), "resources", "sample_template.xlsx")
+        if os.path.exists(template_path):
+            with open(template_path, "rb") as f:
+                template_data = f.read()
+            st.download_button(
+                label="📄 엑셀 양식 다운로드",
+                data=template_data,
+                file_name="sample_template.xlsx",
+                mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                help="키워드 생성에 사용할 엑셀 양식을 다운로드합니다",
+                use_container_width=True
+            )
+        
+        st.markdown("---")
         
         # 현재 상태 표시
         if st.session_state.results_df is not None:
@@ -251,6 +292,10 @@ def main():
                 st.session_state.results_df = None
                 st.session_state.file_processed = False
                 st.session_state.current_file_name = None
+                st.session_state.excel_data = None
+                st.session_state.excel_filename = None
+                # 파일 업로더 초기화를 위해 세션 상태에 플래그 추가
+                st.session_state.reset_uploader = True
                 st.rerun()
     
     # 메인 컨텐츠 영역
@@ -258,11 +303,18 @@ def main():
     
     with col1:
         st.header("📁 파일 업로드")
-        uploaded_file = st.file_uploader(
-            "엑셀 파일을 업로드하세요",
-            type=['xlsx', 'xls'],
-            help="조합 규칙이 포함된 엑셀 파일을 선택하세요"
-        )
+        
+        # reset_uploader 플래그가 True인 경우 파일 업로더 초기화
+        if st.session_state.reset_uploader:
+            st.session_state.reset_uploader = False
+            uploaded_file = None
+        else:
+            uploaded_file = st.file_uploader(
+                "엑셀 파일을 업로드하세요",
+                type=['xlsx', 'xls'],
+                help="조합 규칙이 포함된 엑셀 파일을 선택하세요",
+                key="file_uploader"  # 키를 추가하여 초기화 가능하도록
+            )
     
     with col2:
         if uploaded_file:
@@ -275,6 +327,8 @@ def main():
                 st.session_state.results_df = None
                 st.session_state.file_processed = False
                 st.session_state.current_file_name = uploaded_file.name
+                st.session_state.excel_data = None
+                st.session_state.excel_filename = None
     
     # 메인 콘텐츠
     if uploaded_file is not None:
@@ -404,30 +458,74 @@ def main():
                     - **그룹별 시트**: 각 그룹의 키워드 목록
                     """)
                     
-                    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-                    filename = f"generated_keywords_{timestamp}.xlsx"
-                    
-                    # 엑셀 파일 생성
-                    excel_data = create_excel_download(results_df)
-                    
-                    st.download_button(
-                        label="📁 엑셀 파일 다운로드",
-                        data=excel_data,
-                        file_name=filename,
-                        mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                        type="primary",
-                        use_container_width=True
-                    )
+                    # 이미 생성된 엑셀 파일이 있는지 확인
+                    if st.session_state.excel_data is not None:
+                        st.success("📁 엑셀 파일이 이미 준비되어 있습니다!")
+                        st.download_button(
+                            label="📥 엑셀 파일 다운로드",
+                            data=st.session_state.excel_data,
+                            file_name=st.session_state.excel_filename,
+                            mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                            type="primary",
+                            use_container_width=True
+                        )
+                        
+                        if st.button("🔄 엑셀 파일 재생성", use_container_width=True):
+                            st.session_state.excel_data = None
+                            st.session_state.excel_filename = None
+                            st.rerun()
+                    else:
+                        # 엑셀 파일 생성 버튼
+                        if st.button("🔧 엑셀 파일 생성", type="primary", use_container_width=True):
+                            with st.spinner("📊 엑셀 파일을 생성하는 중... 잠시만 기다려주세요."):
+                                # 진행 상황 표시
+                                progress_bar = st.progress(0)
+                                status_text = st.empty()
+                                
+                                # 타임스탬프 생성
+                                timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+                                filename = f"generated_keywords_{timestamp}.xlsx"
+                                
+                                # 엑셀 파일 생성 (진행 상황 표시 포함)
+                                excel_data = create_excel_download(results_df, progress_bar, status_text)
+                                
+                                # 세션 상태에 저장
+                                st.session_state.excel_data = excel_data
+                                st.session_state.excel_filename = filename
+                                
+                                # 완료 메시지
+                                status_text.text("✅ 엑셀 파일 생성 완료!")
+                                
+                                # 다운로드 버튼 표시
+                                st.success("📁 엑셀 파일이 준비되었습니다!")
+                                st.download_button(
+                                    label="📥 엑셀 파일 다운로드",
+                                    data=excel_data,
+                                    file_name=filename,
+                                    mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                                    type="primary",
+                                    use_container_width=True
+                                )
+                        else:
+                            st.info("💡 위의 '엑셀 파일 생성' 버튼을 클릭하여 다운로드 파일을 준비하세요.")
                 
                 with col2:
-                    st.info(f"""
-                    **파일 정보**
-                    - 파일명: {filename}
-                    - 총 시트 수: {results_df['group'].nunique() + 1}
-                    - 총 키워드 수: {len(results_df):,}
-                    """)
+                    # 파일 정보 표시
+                    if st.session_state.excel_data is not None:
+                        st.success(f"""
+                        **📁 엑셀 파일 정보**
+                        - 파일명: {st.session_state.excel_filename}
+                        - 총 시트 수: {results_df['group'].nunique() + 1}
+                        - 총 키워드 수: {len(results_df):,}
+                        """)
+                    else:
+                        st.info(f"""
+                        **📊 예상 파일 정보**
+                        - 총 시트 수: {results_df['group'].nunique() + 1}
+                        - 총 키워드 수: {len(results_df):,}
+                        """)
                     
-                    # 생성된 시트 목록
+                    # 생성될 시트 목록
                     with st.expander("📋 생성될 시트 목록"):
                         st.write("1. **Dashboard** (통계 정보)")
                         for i, group in enumerate(sorted(results_df['group'].unique()), 2):
