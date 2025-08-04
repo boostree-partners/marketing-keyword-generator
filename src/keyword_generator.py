@@ -73,7 +73,11 @@ def generate_keyword_combinations(df_data, column_numbers, category_titles):
     for idx, row in df_data.iterrows():
         rule = row.iloc[0]  # 조합 규칙 (A열)
         group = row.iloc[1]  # 그룹 (B열)
-        if pd.notna(rule) and pd.notna(group):
+        
+        # 조합 규칙이 있고, 그룹이 비어있으면 'ungrouped'으로 대체
+        if pd.notna(rule):
+            if pd.isna(group) or str(group).strip() == '':
+                group = 'ungrouped'
             rule_group_mapping[str(rule)] = str(group)
             print(f"  {rule} -> {group}")
     
